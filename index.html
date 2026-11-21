@@ -1,0 +1,111 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1"><title>四组独立光伏钢棚 · 三维工程预览V10</title><style>*{box-sizing:border-box}body{margin:0;background:#05070b;font:14px system-ui,'Microsoft Yahei',sans-serif;color:#eef3f1}#scene{position:fixed;inset:0;touch-action:none}header{position:absolute;top:12px;left:12px;right:12px;background:#202a27eb;border:1px solid #44534d;border-radius:15px;padding:14px;max-width:440px;pointer-events:none}h2{margin:0 0 5px;font-size:19px}small{color:#a9b9b3}.panel{position:absolute;bottom:12px;left:12px;right:12px;max-width:680px;max-height:min(65vh,520px);overflow-y:auto;margin:auto;background:#202a27ef;border:1px solid #4b5b54;border-radius:16px;padding:14px;box-shadow:0 8px 30px #0004}.line{display:flex;justify-content:space-between;gap:8px;align-items:center}.value{font-weight:bold}input[type=range]{width:100%;accent-color:#b5d3b9;margin:16px 0}.buttons{display:flex;flex-wrap:wrap;gap:7px;margin-top:10px}button{background:#303c37;color:#f0f4f1;border:1px solid #65766d;border-radius:9px;padding:9px 12px;font:inherit;cursor:pointer}button.active{background:#a7c5b1;color:#172820}#note{margin-top:9px;color:#b9c6bd;font-size:11px;line-height:1.45}#panelToggle{position:fixed;right:14px;bottom:calc(14px + env(safe-area-inset-bottom));z-index:20;background:#20342c;color:white;border:1px solid #9eb6a6;border-radius:30px;padding:12px 17px;box-shadow:0 4px 16px #0005;font-weight:700}.panel{z-index:15;bottom:calc(65px + env(safe-area-inset-bottom));transition:opacity .18s,transform .18s}.panel.is-hidden{display:none}header{right:auto;max-width:min(440px,calc(100vw - 24px));padding:10px 13px}header h2{font-size:16px}@media(max-width:480px){header small{font-size:10px}.panel{left:8px;right:8px;padding:11px}.buttons button{padding:9px 10px}}#error{position:absolute;top:150px;left:15px;color:#8a1919;background:white;padding:8px;display:none}
+/* V5: compact right-edge controls; no full-width overlay */
+header{top:8px;left:8px;padding:7px 10px;max-width:min(310px,calc(100vw - 72px));border-radius:9px;background:#202a27d9}
+header h2{font-size:13px;margin:0 0 2px}header small{font-size:9px;line-height:1.2;display:block}
+#panelToggle{right:8px;top:9px;bottom:auto;padding:7px 9px;border-radius:9px;font-size:11px;min-width:54px}
+.panel{position:fixed;top:49px;right:8px;left:auto;bottom:auto;margin:0;width:min(235px,calc(100vw - 16px));max-height:min(70vh,500px);padding:9px;border-radius:10px;font-size:11px;background:#202a27ed}
+.panel .line{display:block}.panel .line .value{display:block;margin-top:3px;font-size:11px}
+.panel input[type=range]{margin:7px 0;height:18px}
+.panel .buttons{gap:4px;margin-top:6px}
+.panel .buttons button{padding:5px 6px;font-size:10px;border-radius:6px;flex:1 1 auto}
+#note{font-size:9px;line-height:1.4;margin-top:7px}
+@media(max-width:480px){header{max-width:calc(100vw - 112px)}header small{font-size:8px}.panel{right:6px;top:44px;width:min(210px,calc(100vw - 12px));padding:8px}#panelToggle{right:6px;top:7px}}
+</style></head><body><div id="scene"></div><header><h2>光伏钢结构 · 交互三维模型</h2><small>4组独立人字钢棚 + 仅左侧1面单坡雨棚 · 长31.2m<br>每组5榀钢架、15根柱、15道檩条 · 主棚60根柱 + 左侧雨棚10根柱 · 方案示意</small></header><div id="error">三维引擎未加载，请检查网络连接。</div><button id="panelToggle" aria-expanded="false" aria-controls="controlPanel">☰ 控制</button><section class="panel is-hidden" id="controlPanel"><div class="line"><b>套管柱高度 · 非真实驱动模拟</b><span class="value" id="heightLabel">檐 3.00m / 脊柱 3.20m</span></div><input id="height" type="range" min="1.3" max="3.5" step="0.05" value="3"><div class="buttons"><button data-h="1.3">低位 1.3m</button><button data-h="2.5">中位 2.5m</button><button data-h="3" class="active">设计 3.0m</button><button data-h="3.5">高位 3.5m</button></div><div class="buttons"><button data-view="iso" class="active">轴测</button><button data-view="front">端立面</button><button data-view="side">侧立面</button><button data-view="top">平面</button><button id="roof">隐藏屋面</button><button id="purlins">隐藏檩条</button><button id="joints">突出节点</button><button id="detail">升降柱近景</button><button id="dimensions">显示柱网尺寸</button><button data-view="iso">复位</button></div><div id="note">四组独立钢棚横向并排，单组宽16m、长31.2m，组间净距0.8m，原总宽66.4m。仅左侧新增一面8.4m宽独立单坡雨棚，外侧高、内侧低（高差0.3m），低侧设水槽和落水管，与主棚留0.8m净距；整体横向总宽75.6m。每坡水平跨度8m，檩条按7等分布置，坡面间距约1.15m，每组15道。升降柱为示意模型，驱动、锁止、基础及檩条8.4m跨结构安全性尚未校核，不可作为施工图使用。</div></section><script type="module">
+import * as T from 'https://cdn.jsdelivr.net/npm/three@0.160.1/build/three.module.js';
+const panel=document.querySelector('#controlPanel'),toggle=document.querySelector('#panelToggle');toggle.addEventListener('click',()=>{const hidden=panel.classList.toggle('is-hidden');toggle.textContent=hidden?'☰ 控制':'✕ 收起';toggle.setAttribute('aria-expanded',String(!hidden));});const mount=document.querySelector('#scene'),scene=new T.Scene();scene.background=new T.Color('#05070b');const camera=new T.PerspectiveCamera(45,innerWidth/innerHeight,.03,500);const renderer=new T.WebGLRenderer({antialias:true});renderer.setPixelRatio(Math.min(devicePixelRatio,2));renderer.setSize(innerWidth,innerHeight);renderer.shadowMap.enabled=true;mount.appendChild(renderer.domElement);scene.add(new T.HemisphereLight(0xffffff,0x8d9c94,2.2));const sun=new T.DirectionalLight(0xffffff,2.1);sun.position.set(-12,25,18);sun.castShadow=true;scene.add(sun);
+const mats={steel:new T.MeshStandardMaterial({color:0x435b6b,metalness:.65,roughness:.38}),column:new T.MeshStandardMaterial({color:0x81929b,metalness:.55,roughness:.4}),inner:new T.MeshStandardMaterial({color:0xb7c4c9,metalness:.5,roughness:.4}),purlin:new T.MeshStandardMaterial({color:0x496e70,metalness:.5,roughness:.4}),roof:new T.MeshStandardMaterial({color:0x9fb9c8,metalness:.28,roughness:.5,side:T.DoubleSide,transparent:true,opacity:.82}),gutter:new T.MeshStandardMaterial({color:0x79c8e8,metalness:.65,roughness:.28,side:T.DoubleSide}),pipe:new T.MeshStandardMaterial({color:0x49b9e6,metalness:.55,roughness:.35}),joint:new T.MeshStandardMaterial({color:0xd99b4c,metalness:.45,roughness:.5}),base:new T.MeshStandardMaterial({color:0x6e7779,roughness:.8})};
+const ground=new T.Mesh(new T.PlaneGeometry(150,150),new T.MeshStandardMaterial({color:0x101820,roughness:1}));ground.rotation.x=-Math.PI/2;ground.position.y=-.07;ground.receiveShadow=true;scene.add(ground);const grid=new T.GridHelper(150,150,0xa7b6af,0xbcc8c1);grid.position.y=-.055;scene.add(grid);
+const structure=new T.Group(),roofGroup=new T.Group(),purlinGroup=new T.Group(),jointGroup=new T.Group(),columns=new T.Group(),dimensionGroup=new T.Group(),drainGroup=new T.Group();scene.add(structure,roofGroup,purlinGroup,jointGroup,columns,dimensionGroup,drainGroup);const xs=[0,6,14.4,22.8,31.2],halfWidth=8,zs=[-halfWidth,0,halfWidth];let height=3,highlight=false;
+function box(w,h,d,mat,parent,x,y,z){const m=new T.Mesh(new T.BoxGeometry(w,h,d),mat);m.position.set(x,y,z);m.castShadow=true;parent.add(m);return m}
+function member(a,b,w,d,mat,parent){const A=new T.Vector3(...a),B=new T.Vector3(...b),v=B.clone().sub(A),m=new T.Mesh(new T.BoxGeometry(w,v.length(),d),mat);m.position.copy(A).add(B).multiplyScalar(.5);m.quaternion.setFromUnitVectors(new T.Vector3(0,1,0),v.normalize());m.castShadow=true;parent.add(m);return m}
+// Hollow square-tube approximation: four physical walls, not a solid bar.
+function tube(parent,x,z,y0,y1,outer,t,mat){let h=y1-y0,mid=(y0+y1)/2;box(outer,h,t,mat,parent,x,mid,z-(outer-t)/2);box(outer,h,t,mat,parent,x,mid,z+(outer-t)/2);box(t,h,outer-2*t,mat,parent,x-(outer-t)/2,mid,z);box(t,h,outer-2*t,mat,parent,x+(outer-t)/2,mid,z)}
+function roofY(z){return height+.8*(1-Math.abs(z)/halfWidth)}
+// H-shaped rafters are represented by two flanges and a web, rather than a solid rectangular prism.
+function hMember(a,b,parent){const A=new T.Vector3(...a),B=new T.Vector3(...b),vec=B.clone().sub(A),len=vec.length(),group=new T.Group();group.position.copy(A).add(B).multiplyScalar(.5);group.quaternion.setFromUnitVectors(new T.Vector3(0,1,0),vec.normalize());
+const flange=0.125,depth=0.25,tf=0.009,tw=0.006;for(const off of [-depth/2+tf/2,depth/2-tf/2])box(flange,len,tf,mats.steel,group,0,0,off);box(tw,len,depth-2*tf,mats.steel,group,0,0,0);parent.add(group);return group}
+function dimLine(a,b){member(a,b,.012,.012,mats.joint,dimensionGroup)}
+function makeDimensions(){dimensionGroup.clear();for(let i=0;i<xs.length-1;i++){dimLine([xs[i],.05,5.05],[xs[i+1],.05,5.05]);dimLine([xs[i],.05,4.75],[xs[i],.05,5.35])}dimLine([31.2,.05,4.75],[31.2,.05,5.35]);dimLine([0,.05,-halfWidth],[0,.05,halfWidth])}
+function build(){
+[structure,roofGroup,purlinGroup,jointGroup,columns,drainGroup].forEach(g=>g.clear());
+for(let bay=0;bay<4;bay++){
+ const zOffset=(bay-1.5)*16.8;
+ const st=new T.Group(),rg=new T.Group(),pg=new T.Group(),jg=new T.Group(),cg=new T.Group();
+ st.position.z=rg.position.z=pg.position.z=jg.position.z=cg.position.z=zOffset;
+ structure.add(st);roofGroup.add(rg);purlinGroup.add(pg);jointGroup.add(jg);columns.add(cg);
+ for(const x of xs){
+  for(const z of zs){const h=height+(z===0?.2:0);
+   box(.5,.10,.5,mats.base,cg,x,.04,z);
+   tube(cg,x,z,.1,Math.min(1.65,h-.35),.2,.006,mats.column);
+   tube(cg,x,z,Math.min(1.15,h-.75),h,.18,.006,mats.inner);
+   box(.28,.035,.28,mats.joint,jg,x,h,z);
+   if(z===0){const ridge=height+.8;member([x,h,z],[x,ridge,z],.16,.16,mats.inner,cg);box(.28,.035,.28,mats.joint,jg,x,ridge,z)}
+  }
+  for(const side of [-1,1]){hMember([x,height,side*halfWidth],[x,height+.8,0],st);box(.3,.12,.3,mats.joint,jg,x,height,side*halfWidth)}
+ }
+ for(let k=0;k<=14;k++){let z=-halfWidth+k*halfWidth/7,y=roofY(z)+.13;
+  for(let i=0;i<xs.length-1;i++)member([xs[i],y,z],[xs[i+1],y,z],.07,.14,mats.purlin,pg)
+ }
+ for(let i=0;i<xs.length-1;i++)for(let side of [-1,1]){
+  let z0=side<0?-halfWidth:0,z1=side<0?0:halfWidth;
+  const geom=new T.BufferGeometry(),verts=[xs[i],roofY(z0)+.23,z0,xs[i+1],roofY(z0)+.23,z0,xs[i+1],roofY(z1)+.23,z1,xs[i],roofY(z0)+.23,z0,xs[i+1],roofY(z1)+.23,z1,xs[i],roofY(z1)+.23,z1];
+  geom.setAttribute('position',new T.Float32BufferAttribute(verts,3));geom.computeVertexNormals();rg.add(new T.Mesh(geom,mats.roof))
+ }
+}
+// One independent single-slope canopy at the LEFT outer edge only, with a 0.8m gap.
+// Both column rows share the same top elevation; sloping roof is supported by schematic brackets.
+for(const sideSign of [-1]){
+ const innerZ=sideSign*34, outerZ=sideSign*42.4;
+ const canopyRoofY=z=>height+.15+.30*Math.abs(z-innerZ)/8.4;
+ const st=new T.Group(),rg=new T.Group(),pg=new T.Group(),cg=new T.Group(),jg=new T.Group();
+ structure.add(st);roofGroup.add(rg);purlinGroup.add(pg);columns.add(cg);jointGroup.add(jg);
+ for(const x of xs){
+  for(const z of [innerZ,outerZ]){
+   box(.5,.10,.5,mats.base,cg,x,.04,z);
+   tube(cg,x,z,.1,Math.min(1.65,height-.35),.2,.006,mats.column);
+   tube(cg,x,z,Math.min(1.15,height-.75),height,.18,.006,mats.inner);
+   member([x,height,z],[x,canopyRoofY(z),z],.16,.16,mats.inner,cg);
+   box(.28,.035,.28,mats.joint,jg,x,canopyRoofY(z),z);
+  }
+  hMember([x,canopyRoofY(innerZ),innerZ],[x,canopyRoofY(outerZ),outerZ],st);
+ }
+ for(let k=0;k<=7;k++){
+  const z=innerZ+sideSign*8.4*k/7, y=canopyRoofY(z)+.13;
+  for(let i=0;i<xs.length-1;i++)member([xs[i],y,z],[xs[i+1],y,z],.07,.14,mats.purlin,pg);
+ }
+ for(let i=0;i<xs.length-1;i++){
+  const geom=new T.BufferGeometry(),verts=[xs[i],canopyRoofY(innerZ)+.23,innerZ,xs[i+1],canopyRoofY(innerZ)+.23,innerZ,xs[i+1],canopyRoofY(outerZ)+.23,outerZ,xs[i],canopyRoofY(innerZ)+.23,innerZ,xs[i+1],canopyRoofY(outerZ)+.23,outerZ,xs[i],canopyRoofY(outerZ)+.23,outerZ];
+  geom.setAttribute('position',new T.Float32BufferAttribute(verts,3));geom.computeVertexNormals();rg.add(new T.Mesh(geom,mats.roof));
+ }
+ // Canopy inner low-edge gutter and two downpipes.
+ const gz=innerZ-sideSign*.18, gy=canopyRoofY(innerZ)-.22;
+ box(31.35,.035,.40,mats.gutter,drainGroup,15.6,gy,gz);
+ for(const side of [-1,1])box(31.35,.22,.035,mats.gutter,drainGroup,15.6,gy+.11,gz+side*.19);
+ for(const x of [0,31.2]){
+  const ph=Math.max(.4,gy-.05),pipe=new T.Mesh(new T.CylinderGeometry(.075,.075,ph,12),mats.pipe);
+  pipe.position.set(x,ph/2,gz);drainGroup.add(pipe);
+ }
+}
+// Three shared drainage corridors between four independently framed sheds.
+// Each 0.8 m corridor has an open-top longitudinal gutter and end downpipes.
+for(let gap=0;gap<3;gap++){
+ const z=(gap-1)*16.8;
+ const gutterTop=height-.08, gutterBottom=height-.33, gw=.62, thick=.035;
+ box(31.35,thick,gw,mats.gutter,drainGroup,15.6,gutterBottom,z);
+ for(const side of [-1,1])box(31.35,gutterTop-gutterBottom,thick,mats.gutter,drainGroup,15.6,(gutterTop+gutterBottom)/2,z+side*(gw-thick)/2);
+ for(const x of [0,31.2]){
+  const pipeZ=z;
+  const pipeRadius=.075;
+  const pipeHeight=Math.max(.35,gutterBottom-.12);
+  const pipe=new T.Mesh(new T.CylinderGeometry(pipeRadius,pipeRadius,pipeHeight,12),mats.pipe);
+  pipe.position.set(x,pipeHeight/2,pipeZ);drainGroup.add(pipe);
+  box(.24,.12,.24,mats.gutter,drainGroup,x,gutterBottom-.06,pipeZ);
+ }
+}
+jointGroup.visible=highlight;makeDimensions()
+}
+let theta=-.73,phi=.82,dist=128,target=new T.Vector3(15.6,1.7,-4.2),pointer=new Map(),lastDistance=0;function updateCamera(){camera.position.set(target.x+dist*Math.sin(phi)*Math.cos(theta),target.y+dist*Math.cos(phi),target.z+dist*Math.sin(phi)*Math.sin(theta));camera.lookAt(target)}function view(v){target.set(15.6,1.7,-4.2);if(v==='front'){theta=Math.PI/2;phi=Math.PI/2;dist=128}else if(v==='side'){theta=0;phi=Math.PI/2;dist=128}else if(v==='top'){theta=-.73;phi=.04;dist=138}else{theta=-.73;phi=.82;dist=128}updateCamera()}view('iso');build();function animate(){requestAnimationFrame(animate);renderer.render(scene,camera)}animate();function apply(h){height=h;document.querySelector('#heightLabel').textContent=`檐 ${h.toFixed(2)}m / 脊柱 ${(h+.2).toFixed(2)}m`;build();document.querySelectorAll('[data-h]').forEach(b=>b.classList.toggle('active',Number(b.dataset.h)===h))}document.querySelector('#height').oninput=e=>apply(Number(e.target.value));document.querySelectorAll('[data-h]').forEach(b=>b.onclick=()=>{document.querySelector('#height').value=b.dataset.h;apply(Number(b.dataset.h))});document.querySelectorAll('[data-view]').forEach(b=>b.onclick=()=>{view(b.dataset.view);document.querySelectorAll('[data-view]').forEach(k=>k.classList.toggle('active',k===b))});document.querySelector('#roof').onclick=e=>{roofGroup.visible=!roofGroup.visible;e.target.textContent=roofGroup.visible?'隐藏屋面':'显示屋面'};document.querySelector('#purlins').onclick=e=>{purlinGroup.visible=!purlinGroup.visible;e.target.textContent=purlinGroup.visible?'隐藏檩条':'显示檩条'};document.querySelector('#joints').onclick=e=>{highlight=!highlight;jointGroup.visible=highlight;e.target.classList.toggle('active',highlight)};
+let detail=false;document.querySelector('#detail').onclick=e=>{detail=!detail;if(detail){roofGroup.visible=false;purlinGroup.visible=false;highlight=true;jointGroup.visible=true;target.set(6,1.8,-25.2-halfWidth);dist=8;theta=-.8;phi=1.1;e.target.textContent='返回整体';}else{roofGroup.visible=true;purlinGroup.visible=true;target.set(15.6,1.7,-4.2);view('iso');e.target.textContent='升降柱近景';}updateCamera()};
+document.querySelector('#dimensions').onclick=e=>{dimensionGroup.visible=!dimensionGroup.visible;e.target.textContent=dimensionGroup.visible?'隐藏柱网尺寸':'显示柱网尺寸'};dimensionGroup.visible=false;
+renderer.domElement.addEventListener('pointerdown',e=>{pointer.set(e.pointerId,[e.clientX,e.clientY]);renderer.domElement.setPointerCapture(e.pointerId)});renderer.domElement.addEventListener('pointermove',e=>{if(!pointer.has(e.pointerId))return;const prev=pointer.get(e.pointerId);pointer.set(e.pointerId,[e.clientX,e.clientY]);if(pointer.size===1){theta+=(e.clientX-prev[0])*.007;phi=Math.max(.08,Math.min(Math.PI-.08,phi-(e.clientY-prev[1])*.007))}else{const p=[...pointer.values()],d=Math.hypot(p[0][0]-p[1][0],p[0][1]-p[1][1]);if(lastDistance)dist=Math.max(9,Math.min(220,dist*lastDistance/d));lastDistance=d}updateCamera()});function release(e){pointer.delete(e.pointerId);lastDistance=0}renderer.domElement.addEventListener('pointerup',release);renderer.domElement.addEventListener('pointercancel',release);renderer.domElement.addEventListener('wheel',e=>{e.preventDefault();dist=Math.max(9,Math.min(220,dist*(e.deltaY>0?1.09:.91)));updateCamera()},{passive:false});addEventListener('resize',()=>{camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight)});
+</script></body></html>
