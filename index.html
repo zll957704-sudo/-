@@ -10,7 +10,7 @@ header h2{font-size:13px;margin:0 0 2px}header small{font-size:9px;line-height:1
 .panel .buttons button{padding:5px 6px;font-size:10px;border-radius:6px;flex:1 1 auto}
 #note{font-size:9px;line-height:1.4;margin-top:7px}
 @media(max-width:480px){header{max-width:calc(100vw - 112px)}header small{font-size:8px}.panel{right:6px;top:44px;width:min(210px,calc(100vw - 12px));padding:8px}#panelToggle{right:6px;top:7px}}
-</style></head><body><div id="scene"></div><header><h2>光伏钢结构 · 交互三维模型</h2><small>四组人字钢棚＋左侧单坡棚 · 右外侧斜角 · 73.3m<br>组件2382×1134mm · 逐坡面排布 · 数量见右侧</small></header><div id="error">三维引擎未加载，请检查网络连接。</div><button id="panelToggle" aria-expanded="false" aria-controls="controlPanel">☰ 控制</button><section class="panel is-hidden" id="controlPanel"><div class="line"><b>套管柱高度 · 非真实驱动模拟</b><span class="value" id="heightLabel">檐 3.00m / 脊柱 3.20m</span></div><input id="height" type="range" min="1.3" max="3.5" step="0.05" value="3"><div class="buttons"><button data-h="1.3">低位 1.3m</button><button data-h="2.5">中位 2.5m</button><button data-h="3" class="active">设计 3.0m</button><button data-h="3.5">高位 3.5m</button></div><div class="buttons"><button data-view="iso" class="active">轴测</button><button data-view="front">端立面</button><button data-view="side">侧立面</button><button data-view="top">平面</button><button id="roof">隐藏屋面</button><button id="purlins">隐藏檩条</button><button id="joints">突出节点</button><button id="detail">升降柱近景</button><button id="dimensions">显示柱网尺寸</button><button data-view="iso">复位</button></div><div id="note">依据三龙厂房光伏平面图：主体长73.3米、四栋各8.4米宽，右外侧33.6米处开始斜收5米；斜边收进量及起点未标注，暂按示意比例。左侧两处未满铺区域以浅色框示意。组件数量由模型逐块生成，仍需按压块、检修通道及边距复核。保留左侧独立单坡雨棚为历史方案，非本次光伏图所示范围。钢构件规格、节点、荷载尚未复核，不得用于施工。</div></section><script type="module">
+</style></head><body><div id="scene"></div><header><h2>光伏钢结构 · 交互三维模型</h2><small>四组人字钢棚＋左侧单坡棚 · 单坡外侧斜角 · 73.3m<br>组件2382×1134mm · 逐坡面排布 · 数量见右侧</small></header><div id="error">三维引擎未加载，请检查网络连接。</div><button id="panelToggle" aria-expanded="false" aria-controls="controlPanel">☰ 控制</button><section class="panel is-hidden" id="controlPanel"><div class="line"><b>套管柱高度 · 非真实驱动模拟</b><span class="value" id="heightLabel">檐 3.00m / 脊柱 3.20m</span></div><input id="height" type="range" min="1.3" max="3.5" step="0.05" value="3"><div class="buttons"><button data-h="1.3">低位 1.3m</button><button data-h="2.5">中位 2.5m</button><button data-h="3" class="active">设计 3.0m</button><button data-h="3.5">高位 3.5m</button></div><div class="buttons"><button data-view="iso" class="active">轴测</button><button data-view="front">端立面</button><button data-view="side">侧立面</button><button data-view="top">平面</button><button id="roof">隐藏屋面</button><button id="purlins">隐藏檩条</button><button id="joints">突出节点</button><button id="detail">升降柱近景</button><button id="dimensions">显示柱网尺寸</button><button data-view="iso">复位</button></div><div id="note">依据三龙厂房光伏平面图：主体长73.3米、四栋各8.4米宽，单坡外侧长边33.6米处开始斜收5米，另一外侧长边保持直线。左侧两处未满铺区域以浅色框示意。组件数量由模型逐块生成，仍需按压块、检修通道及边距复核。保留左侧独立单坡雨棚为历史方案，非本次光伏图所示范围。钢构件规格、节点、荷载尚未复核，不得用于施工。</div></section><script type="module">
 // Multiple CDN fallbacks improve compatibility with different networks and browsers.
 const errorBox=document.getElementById('error');
 function showError(message){errorBox.textContent=message;errorBox.style.display='block';errorBox.style.position='fixed';errorBox.style.top='50%';errorBox.style.left='50%';errorBox.style.transform='translate(-50%,-50%)';errorBox.style.zIndex='99';errorBox.style.maxWidth='min(90vw,460px)';errorBox.style.padding='16px';errorBox.style.borderRadius='10px';errorBox.style.color='#7a211b';errorBox.style.lineHeight='1.7';}
@@ -64,8 +64,8 @@ function pvRoof(xStart,xEnd,zStart,zEnd,roofFn,clipFn){
 
 
 const BAY=8.4, MAIN_LEFT=-16.8, MAIN_RIGHT=16.8, CANOPY_OUT=-25.2;
-const edgeAt=x=>MAIN_RIGHT-5*Math.max(0,Math.min(1,(x-33.6)/(L-33.6)));
-const inside=(x,z)=>z<=edgeAt(x)+1e-6;
+const edgeAt=x=>MAIN_RIGHT; // Gable frames remain unchanged: diagonal is on the opposite single-slope outer edge.
+const inside=(x,z)=>true;
 function lineClipped(x1,x2,z1,z2,yfn,mat,parent,w=.09,d=.11){
  const a=inside(x1,z1),b=inside(x2,z2);
  if(!a&&!b)return;
@@ -101,7 +101,7 @@ function build(){
    box(.24,.035,.24,mats.joint,jg,x,h,z);
   }
   for(const [a,b] of [[zl,zc],[zc,zr]])lineClipped(x,x,a,b,ry,mats.steel,st,.14,.22);
-  if(edgeAt(x)>zl+.05&&edgeAt(x)<zr-.05){const z=edgeAt(x);box(.42,.10,.42,mats.base,cg,x,.04,z);tube(cg,x,z,.1,height,.18,.006,mats.column);box(.24,.035,.24,mats.joint,jg,x,height,z);}
+
  }
  for(let k=0;k<=7;k++){const z=zl+BAY*k/7;for(let i=0;i<xs.length-1;i++)lineClipped(xs[i],xs[i+1],z,z,zv=>ry(zv)+.13,mats.purlin,pg,.065,.12);}
  for(let i=0;i<xs.length-1;i++)for(const [a,b] of [[zl,zc],[zc,zr]])roofPoly([[xs[i],a],[xs[i+1],a],[xs[i+1],b],[xs[i],b]],z=>ry(z)+.23,rg,mats.roof);
@@ -109,18 +109,64 @@ function build(){
  }
  // Four independent gable bays, with drainage gutters between adjacent structures.
  for(const z of [MAIN_LEFT+BAY,MAIN_LEFT+2*BAY,MAIN_LEFT+3*BAY]){
-  const gutterEnd=z>edgeAt(L)?33.6+(MAIN_RIGHT-z)*(L-33.6)/5:L;
+  const gutterEnd=L;
   box(gutterEnd,.035,.36,mats.gutter,drainGroup,gutterEnd/2,height-.24,z);
   for(const x of [0,gutterEnd]){const p=new T.Mesh(new T.CylinderGeometry(.065,.065,height-.28,12),mats.pipe);p.position.set(x,(height-.28)/2,z);drainGroup.add(p);}
  }
- // Separate single-slope canopy on left, higher on outside edge.
- const zi=MAIN_LEFT-.8,zo=zi-BAY,cy=z=>height+.15+.3*Math.abs(z-zi)/BAY;
- for(const x of xs){for(const z of [zi,zo]){tube(columns,x,z,.1,height,.18,.006,mats.column);box(.42,.1,.42,mats.base,columns,x,.04,z);member([x,height,z],[x,cy(z),z],.13,.13,mats.inner,columns);}member([x,cy(zi),zi],[x,cy(zo),zo],.14,.22,mats.steel,structure);}
- for(let k=0;k<=7;k++){const z=zi+(zo-zi)*k/7;for(let i=0;i<xs.length-1;i++)member([xs[i],cy(z)+.13,z],[xs[i+1],cy(z)+.13,z],.065,.12,mats.purlin,purlinGroup);}
- for(let i=0;i<xs.length-1;i++){const a=xs[i],b=xs[i+1],g=new T.BufferGeometry();g.setAttribute('position',new T.Float32BufferAttribute([a,cy(zi)+.23,zi,b,cy(zi)+.23,zi,b,cy(zo)+.23,zo,a,cy(zi)+.23,zi,b,cy(zo)+.23,zo,a,cy(zo)+.23,zo],3));g.computeVertexNormals();roofGroup.add(new T.Mesh(g,mats.roof));}
+
+ // Opposite-side diagonal on the outer edge of the independent SINGLE-SLOPE canopy.
+ // Keep all four gable groups, their original ridge orientations and their 3D elevation controls untouched.
+ // From longitudinal x=33.6m to x=73.3m, the canopy outer eave moves IN by 5.0m.
+ const zi=MAIN_LEFT-.8, zo=zi-BAY, cy=z=>height+.15+.3*Math.abs(z-zi)/BAY;
+ const monoEdge=x=>zo+5*Math.max(0,Math.min(1,(x-33.6)/(L-33.6)));
+ const inMono=(x,z)=>z>=monoEdge(x)-1e-6;
+ function monoMember(x1,x2,z,mat,parent,w=.065,d=.12){
+  let a=inMono(x1,z),b=inMono(x2,z);
+  if(!a&&!b)return;
+  if(a!==b){
+   let lo=0,hi=1;for(let n=0;n<28;n++){const t=(lo+hi)/2,v=x1+(x2-x1)*t;if(inMono(v,z)===a)lo=t;else hi=t;}
+   const t=(lo+hi)/2,cut=x1+(x2-x1)*t;
+   if(a)x2=cut;else x1=cut;
+  }
+  if(x2>x1+.03)member([x1,cy(z)+.13,z],[x2,cy(z)+.13,z],w,d,mat,parent);
+ }
+ // Frame-and-column stations along the longitudinal direction.
+ for(const x of xs){
+  const edge=monoEdge(x);
+  for(const z of [zi,edge]){
+   tube(columns,x,z,.1,height,.18,.006,mats.column);
+   box(.42,.1,.42,mats.base,columns,x,.04,z);
+   member([x,height,z],[x,cy(z),z],.13,.13,mats.inner,columns);
+  }
+  member([x,cy(zi),zi],[x,cy(edge),edge],.14,.22,mats.steel,structure);
+ }
+ // Longitudinal purlins: every one terminates at the oblique edge.
+ for(let k=0;k<=7;k++){
+  const z=zi+(zo-zi)*k/7;
+  for(let i=0;i<xs.length-1;i++)monoMember(xs[i],xs[i+1],z,mats.purlin,purlinGroup);
+ }
+ // Roof mesh: trapezoids built from actual station-based diagonal intersections.
+ for(let i=0;i<xs.length-1;i++){
+  const a=xs[i],b=xs[i+1],ea=monoEdge(a),eb=monoEdge(b);
+  const g=new T.BufferGeometry();
+  const verts=[a,cy(zi)+.23,zi, b,cy(zi)+.23,zi, b,cy(eb)+.23,eb,
+               a,cy(zi)+.23,zi, b,cy(eb)+.23,eb, a,cy(ea)+.23,ea];
+  g.setAttribute('position',new T.Float32BufferAttribute(verts,3));
+  g.computeVertexNormals();roofGroup.add(new T.Mesh(g,mats.roof));
+ }
+ // The real diagonal steel eave follows the canopy perimeter.
+ for(let i=0;i<xs.length-1;i++){
+  const a=xs[i],b=xs[i+1],ea=monoEdge(a),eb=monoEdge(b);
+  member([a,cy(ea)-.19,ea],[b,cy(eb)-.19,eb],.09,.18,mats.gutter,drainGroup);
+ }
  box(L,.04,.36,mats.gutter,drainGroup,L/2,cy(zi)-.2,zi);
- pvRoof(0,L,zo,zi,cy,null);
- document.querySelector("header small").textContent=`4栋独立人字棚＋1栋单坡 · 73.3m · 2382×1134mm光伏 ${pvCount}块 · 按630W约${(pvCount*.63).toFixed(2)}kWp（几何排布）`;
+ for(const x of [0,L]){
+  const pipe=new T.Mesh(new T.CylinderGeometry(.06,.06,height-.27,10),mats.pipe);
+  pipe.position.set(x,(height-.27)/2,zi);drainGroup.add(pipe);
+ }
+ // Clip EVERY PV module to the actual slanted single-slope roof edge.
+ pvRoof(0,L,zo,zi,cy,(a,z,b,z2)=>inMono(a,z)&&inMono(a,z2)&&inMono(b,z)&&inMono(b,z2));
+ document.querySelector("header small").textContent=`4栋人字棚＋左侧单坡 · 单坡外侧斜角33.6m起、收进5m · 组件${pvCount}块（几何示意）`;
  jointGroup.visible=highlight;dimensionGroup.clear();
 }
 const overviewCenter=new T.Vector3(36.65,1.7,-4.6);
