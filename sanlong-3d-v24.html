@@ -1,0 +1,214 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><title>三龙厂房｜钢结构及光伏三维模型 V24</title>
+<style>
+*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#08111b;color:#e5f0fb;font:13px system-ui,"Microsoft YaHei",sans-serif}canvas{width:100%;height:100dvh;display:block;touch-action:none}#header{position:fixed;top:8px;left:8px;border:1px solid #47647d;background:#14293ae9;border-radius:10px;padding:9px 12px;max-width:min(340px,calc(100vw - 105px));pointer-events:none}h1{font-size:15px;margin:0 0 4px}#header p{font-size:11px;line-height:1.55;margin:0;color:#c6dbec}#panel{position:fixed;right:8px;top:8px;width:min(235px,75vw);z-index:3;border-radius:9px;border:1px solid #56758c;background:#183246ed;padding:7px;max-height:73dvh;overflow:auto}#panel:not([open]){width:93px}#panel summary{font-weight:700;cursor:pointer;padding:5px;list-style:none}#panel summary::-webkit-details-marker{display:none}button{font:inherit;font-size:11px;color:#eaf5fc;background:#284b64;border:1px solid #66869c;border-radius:6px;padding:7px;cursor:pointer}button.selected{background:#9bb0bd;color:#122333}.buttons{display:flex;flex-wrap:wrap;gap:4px;margin:7px 0}input{width:100%;accent-color:#a5becb}label{display:block;margin-top:7px}#note{position:fixed;left:8px;bottom:8px;max-width:min(800px,calc(100vw - 16px));background:#132738df;border:1px solid #3c596e;padding:7px 10px;border-radius:7px;color:#b7d2e5;font-size:10px;line-height:1.5}#mini{position:fixed;right:8px;bottom:92px;width:105px;height:208px;background:#132b3cdb;border:1px solid #5a7a95;border-radius:7px;pointer-events:none}#mini text{fill:#d9eaf3;font-size:9px}#mini #shape{fill:#264c64;stroke:#91b1c1;stroke-width:2}#mini .ridge{stroke:#e5ca88;stroke-width:1.4}#mini .boundary{stroke:#85c5ee;stroke-width:.7}#columnSection{position:fixed;left:8px;bottom:90px;width:212px;padding:7px 9px;border-radius:8px;border:1px solid #607e93;background:#112d41eb;font-size:11px}#columnSection svg{display:block;width:100%;height:106px}#columnSection small{display:block;color:#b1d1e6;font-size:10px;line-height:1.3}@media(max-width:560px){#columnSection{bottom:100px;width:151px;padding:5px}#columnSection svg{height:77px}}
+@media(max-width:560px){#header h1{font-size:12px}#header p{font-size:10px}#header{max-width:calc(100vw - 103px)}#mini{width:80px;height:158px;bottom:84px}#note{font-size:9px}}
+</style></head><body>
+<canvas id="model"></canvas>
+<div id="header"><h1>三龙厂房｜独立五栋＋85cm柱距＋斜角钢梁 V24</h1><p>真实几何比例：<b>73.3m × 34m</b>（长宽 2.16:1）<br>一栋单坡＋四栋独立人字梁；每栋柱梁独立，彼此不共柱<br><b id="side">斜角在右侧长边</b>：33.6m开始，终点内收5m<br><span id="count">光伏排布计算中</span></p></div>
+<details id="panel"><summary>☰ 三维控制</summary><div class="buttons"><button id="iso" class="selected">3D轴测</button><button id="top">平面俯视</button><button id="front">端立面</button><button id="reset">复位</button></div>
+<label>升降柱高度 ↑伸出 / ↓缩回 <b id="heightLabel">3.00米</b><input id="height" type="range" min="1.3" max="3.5" step="0.05" value="3"></label>
+<div class="buttons"><button id="switch" style="background:#825d32">临时切换斜角到左侧</button><button id="dragReverse">旋转手势：拖动模型</button><button id="detail">查看升降柱细节</button></div>
+<div class="buttons"><button id="frameView">查看梁柱及C型钢</button><button id="pv">隐藏光伏</button><button id="roof">隐藏屋面</button><button id="purlins">隐藏檩条</button><button id="gutters">隐藏水槽</button></div>
+<div style="color:#b9d0df;font-size:10px;line-height:1.5">左右、上下拖动均按手指方向旋转，可连续翻转360°且不锁角；双指缩放无固定上限。钢柱升降功能保留。</div></details>
+<svg id="mini" viewBox="0 0 105 208" xmlns="http://www.w3.org/2000/svg" aria-label="钢棚实际比例俯视，斜角位置与梁方向">
+<text x="8" y="12">等比例俯视</text><path id="shape" d="M10 190H95V109L82.5 15H10Z"/><g id="minilines"></g><text x="16" y="202">横宽34m</text><text x="6" y="125" transform="rotate(-90 6 125)">纵长73.3m</text></svg>
+<div id="note">V24：相邻两栋边柱之间850mm，梁端各超柱200mm，屋面檐口之间保留450mm；补斜边250H钢梁、每栋独立水槽和各檐口柱下落水管；补齐840灰瓦、光伏至可放整板区域。所有连接、排水坡度、荷载及结构尺寸须由CAD深化校核。</div>
+<script>
+(()=>{'use strict';
+const canvas=document.getElementById('model'),ctx=canvas.getContext('2d'),L=73.3,W=34,START=33.6,INSET=5;
+let width=0,height=0,dpr=1,ang=-.52,pitch=.78,zoom=1.15,level=3,leftSide=false,solar=true,roof=true,purlins=true,gutters=true,reverseDrag=false,detailMode=false;
+const COLUMN_OUT=0.200,COLUMN_IN=0.180,OUTER_TOP=1.02,INNER_VISIBLE_START=.87,H_BEAM_DEPTH=.250,H_FLANGE_WIDTH=.125;
+const bays=[{type:'mono',a:0,b:8.4},{type:'gable',a:8.4,b:25.2},{type:'gable',a:25.2,b:42},{type:'gable',a:42,b:58.8},{type:'gable',a:58.8,b:73.3}];
+let faces=[],segments=[],pvCount=0,postCount=0,cPurlinCount=0,beamCount=0,connectionCount=0,gutterCount=0,downpipeCount=0,diagonalBeams=0;const GAP=.85,OVERHANG=.20,EDGE_SHIFT=(GAP/2-OVERHANG);
+const inset=z=>INSET*Math.max(0,Math.min(1,(z-START)/(L-START)));
+const allowedX=(x,z)=>leftSide?x>=inset(z)-.0001:x<=W-inset(z)+.0001;
+const minX=z=>leftSide?inset(z):0,maxX=z=>leftSide?W:W-inset(z);
+const roofY=(z,b)=>b.type==='mono'?level+.45*(1-z/8.4):level+.72*(1-Math.abs(z-(b.a+8.4))/8.4);
+function face(points,fill,outline=null,sw=.4){faces.push({points,fill,outline,sw});}
+function line(a,b,color='#91aab9',sw=1){segments.push({a,b,color,sw});}
+// Square tube exterior surfaces are modeled in metres, not fixed pixel stroke widths.
+// Wall thickness is unknown; this is an external-envelope representation only.
+function boxColumn(x,z,y0,y1,side,colors){
+ if(y1<=y0+.005)return;
+ const d=side/2;
+ const p=[[x-d,z-d],[x+d,z-d],[x+d,z+d],[x-d,z+d]];
+ for(let i=0;i<4;i++){const a=p[i],b=p[(i+1)%4];face([[a[0],y0,a[1]],[b[0],y0,b[1]],[b[0],y1,b[1]],[a[0],y1,a[1]]],colors[i],null,.4);}
+ face(p.map(q=>[q[0],y1,q[1]]),colors[4]||colors[0]);
+}
+function telescopicColumn(x,z,H){
+ // Outer 200mm section remains fixed to the base. Inner 180mm section rises vertically.
+ // This visual envelope does not certify sufficient physical stroke or overlap.
+ boxColumn(x,z,INNER_VISIBLE_START,Math.max(INNER_VISIBLE_START,H-.08),COLUMN_IN,['#ced9df','#aebfc9','#e0e8eb','#afbec8','#d7e4ea']);
+ boxColumn(x,z,.02,OUTER_TOP,COLUMN_OUT,['#728b9d','#4c667b','#8ba4b5','#5b7285','#849cac']);
+ // Visible transition collar at fixed upper edge of the outer sleeve.
+ boxColumn(x,z,OUTER_TOP-.025,OUTER_TOP+.025,.217,['#a6b7c4','#7e919e','#b9c8d0','#8499a7','#bed0dc']);
+}
+
+// Draw a physical member but clip it exactly at the diagonal perimeter.
+function hBeam(a,b){
+ const dx=b[0]-a[0],dz=b[2]-a[2],length=Math.hypot(dx,dz);if(length<.03)return;
+ const nx=-dz/length,nz=dx/length,fw=H_FLANGE_WIDTH/2;
+ function ribbon(off,w,color){face([[a[0]+nx*w,a[1]+off,a[2]+nz*w],[b[0]+nx*w,b[1]+off,b[2]+nz*w],[b[0]-nx*w,b[1]+off,b[2]-nz*w],[a[0]-nx*w,a[1]+off,a[2]-nz*w]],color);}
+ ribbon(-H_BEAM_DEPTH/2,fw,'#10161c');
+ ribbon(H_BEAM_DEPTH/2,fw,'#35414c');
+ face([[a[0],a[1]-H_BEAM_DEPTH/2,a[2]],[b[0],b[1]-H_BEAM_DEPTH/2,b[2]],[b[0],b[1]+H_BEAM_DEPTH/2,b[2]],[a[0],a[1]+H_BEAM_DEPTH/2,a[2]]],'#0b1118');
+ face([[a[0],a[1]+.050,a[2]],[b[0],b[1]+.050,b[2]],[b[0],b[1]+.064,b[2]],[a[0],a[1]+.064,a[2]]],'#748593');
+ line([a[0]+nx*fw,a[1]+H_BEAM_DEPTH/2,a[2]+nz*fw],[b[0]+nx*fw,b[1]+H_BEAM_DEPTH/2,b[2]+nz*fw],'#a4b5c1',.65);beamCount++;
+}
+function columnHead(x,z,H){
+ boxColumn(x,z,H-.205,H-.125,.32,['#26303a','#111820','#45515d','#202a35','#687581']);
+ face([[x-.095,H-.35,z-.09],[x-.095,H-.15,z-.09],[x-.095,H-.15,z+.09]],'#28323d');
+ face([[x+.095,H-.35,z+.09],[x+.095,H-.15,z+.09],[x+.095,H-.15,z-.09]],'#53606b');
+ line([x-.115,H-.145,z-.11],[x+.115,H-.145,z-.11],'#b1c0ca',.7);connectionCount++;
+}
+function galvanizedC(x0,x1,z,y){
+ if(x1-x0<.08)return;
+ const ht=.220/2,fw=.060/2,t=.002,lip=.020;
+ const outline=[[-fw,ht],[fw,ht],[fw,ht-lip],[fw-t,ht-lip],
+                [fw-t,ht-t],[-fw+t,ht-t],[-fw+t,-ht+t],
+                [fw-t,-ht+t],[fw-t,-ht+lip],[fw,-ht+lip],
+                [fw,-ht],[-fw,-ht]];
+ const shades=['#e3ebef','#8b9ca8','#d6e0e6','#afbec8','#edf3f6',
+               '#7f95a4','#c4d1da','#9aaebb','#e2e9ec','#748c9d',
+               '#d1dbe1','#6e8491'];
+ for(let i=0;i<outline.length;i++){
+  const a=outline[i],b=outline[(i+1)%outline.length];
+  face([[x0,y+a[1],z+a[0]],[x1,y+a[1],z+a[0]],
+        [x1,y+b[1],z+b[0]],[x0,y+b[1],z+b[0]]],shades[i],null,.2);
+ }
+ face(outline.map(p=>[x0,y+p[1],z+p[0]]),'#a4b5bf','#c8d8e1',.25);
+ face(outline.map(p=>[x1,y+p[1],z+p[0]]),'#647b8c','#b1c3cf',.2);
+ cPurlinCount++;
+}
+function clippedMember(x,z1,z2,yAt,color='#b9cad1',sw=2){let a=z1,b=z2;if(a>=b||a>=L||!allowedX(x,a))return;
+ if(!allowedX(x,b)){let lo=a,hi=b;for(let i=0;i<30;i++){const m=(lo+hi)/2;if(allowedX(x,m))lo=m;else hi=m;}b=lo;}
+ if(b-a>.02)hBeam([x,yAt(a),a],[x,yAt(b),b]);}
+function build(){faces=[];segments=[];pvCount=0;postCount=0;cPurlinCount=0;beamCount=0;connectionCount=0;gutterCount=0;downpipeCount=0;diagonalBeams=0;
+ for(let bi=0;bi<bays.length;bi++){
+   const bay=bays[bi];
+   // Independent neighboring edge columns are exactly 0.85m apart.
+   // H-beam/roof eaves project 0.20m beyond their own column lines.
+   const colA=bay.a+(bi?GAP/2:OVERHANG), colB=bay.b-(bi<bays.length-1?GAP/2:OVERHANG);
+   const a0=colA-OVERHANG,b0=colB+OVERHANG;
+   const ridge=bay.a+8.4;
+   const split=bay.type==='mono'?[a0,b0]:[a0,ridge,b0];
+   const supportLines=bay.type==='mono'?[colA,colB]:[colA,ridge,colB];
+   const bayColumns=new Set();
+   function independentPost(x,z){
+     if(!allowedX(x,z))return;
+     const key=Math.round(x*1000)+':'+Math.round(z*1000);
+     if(bayColumns.has(key))return;
+     for(const existing of bayColumns){const [px,pz]=existing.split(':').map(Number);if(Math.abs(x-px/1000)<.23 && Math.abs(z-pz/1000)<.23)return;}
+     bayColumns.add(key);const H=roofY(z,bay);
+     telescopicColumn(x,z,H);columnHead(x,z,H);postCount++;
+   }
+   // Two sloping planes for every gable. Clipped along the actual outer diagonal.
+   for(let i=0;i<split.length-1;i++){const a=split[i],b=split[i+1];
+    if(roof){
+      // Grey 840-profile metal roofing lies above the purlins and below PV modules.
+      for(let z=a;z<b-.001;z+=.42){
+        const z2=Math.min(z+.42,b);
+        face([[minX(z),roofY(z,bay)+.19,z],[maxX(z),roofY(z,bay)+.19,z],[maxX(z2),roofY(z2,bay)+.19,z2],[minX(z2),roofY(z2,bay)+.19,z2]],'#8f9ca5','#c6cfd4',.18);
+      }
+      // 840mm repeat visual corrugation. Raised rib strips run in the roof-slope direction.
+      for(let x=.84;x<=W+.01;x+=.84){
+        for(let z=a;z<b-.001;z+=.5){
+          const z2=Math.min(z+.5,b),ribW=.035;
+          if(!allowedX(x,z)||!allowedX(x+ribW,z)||!allowedX(x,z2)||!allowedX(x+ribW,z2))continue;
+          face([[x,roofY(z,bay)+.218,z],[x+ribW,roofY(z,bay)+.218,z],[x+ribW,roofY(z2,bay)+.218,z2],[x,roofY(z2,bay)+.218,z2]],'#e1e6e9',null,.1);
+        }
+      }
+    }
+    if(solar)for(let z=a+.12;z+1.134<=b-.10;z+=1.154){for(let x=.14;x+2.382<=W-.14;x+=2.422){if(!allowedX(x,z)||!allowedX(x+2.382,z)||!allowedX(x,z+1.134)||!allowedX(x+2.382,z+1.134))continue;
+      const z2=z+1.134,x2=x+2.382;face([[x,roofY(z,bay)+.30,z],[x2,roofY(z,bay)+.30,z],[x2,roofY(z2,bay)+.30,z2],[x,roofY(z2,bay)+.30,z2]],'#174b75','#8dd2fa',.55);pvCount++;
+    }}
+   }
+   // Primary gable frames span along the full 73.3m length direction, as confirmed.
+   const stations=[0,8.4,16.8,25.2,34];
+   for(const x of stations){for(let i=0;i<split.length-1;i++)clippedMember(x,split[i],split[i+1],z=>roofY(z,bay),'#c4d4dc',2.15);}
+   // Roof purlins run across the 34m direction at ~1.2m centers.
+   if(purlins)for(let z=a0+.15;z<=b0-.04;z+=1.2){
+ galvanizedC(minX(z)+.09,maxX(z)-.09,z,roofY(z,bay)+.065);
+}
+   // Telescopic column assemblies: two steel shafts and a top plate, at frame corners and ridge.
+   for(const z of supportLines){for(const x of stations)independentPost(x,z);}
+   // Separate gutter at each eave of each gable, plus low eave of the monoslope roof.
+   // Each steel eave column receives a downpipe and 20cm downpipe connector.
+   if(gutters)for(const [eaveZ,colZ] of (bay.type==='mono'?[[b0,colB]]:[[a0,colA],[b0,colB]])){
+     const startX=minX(eaveZ),endX=maxX(eaveZ),gY=roofY(eaveZ,bay)-.19;
+     if(endX-startX<.25)continue;
+     // gutter trough represented by its two raised rims and base sheet
+     face([[startX,gY-.065,eaveZ-.17],[endX,gY-.065,eaveZ-.17],[endX,gY-.065,eaveZ+.17],[startX,gY-.065,eaveZ+.17]],'#748d9a');
+     line([startX,gY,eaveZ-.17],[endX,gY,eaveZ-.17],'#b6cad2',2.3);
+     line([startX,gY,eaveZ+.17],[endX,gY,eaveZ+.17],'#cbdce1',2.3);
+     gutterCount++;
+     for(const x of stations){
+       if(!allowedX(x,colZ)||!allowedX(x,eaveZ))continue;
+       line([x,gY,eaveZ],[x,gY-.18,colZ],'#8ccbe0',3.1);
+       line([x,gY-.18,colZ],[x,.06,colZ],'#b6d4dc',3.4);
+       downpipeCount++;
+     }
+   }
+ }
+ // Add slanted outer perimeter H250 members, broken at each roof slope transition.
+ // No unwanted ridge/eave longitudinal beam.
+ for(const bay of bays.slice(2)){
+   const a=Math.max(START,bay.a),b=Math.min(L,bay.b);
+   const stops=[a,b];
+   if(bay.type==='gable'&&bay.a+8.4>a&&bay.a+8.4<b)stops.splice(1,0,bay.a+8.4);
+   for(let k=0;k<stops.length-1;k++){
+     const lo=stops[k],hi=stops[k+1],step=.6;
+     for(let z=lo;z<hi-.001;z+=step){
+       const z2=Math.min(z+step,hi);
+       if(leftSide)hBeam([minX(z),roofY(z,bay),z],[minX(z2),roofY(z2,bay),z2]);
+       else hBeam([maxX(z),roofY(z,bay),z],[maxX(z2),roofY(z2,bay),z2]);
+       diagonalBeams++;
+     }
+   }
+ }
+ document.getElementById('count').textContent='独立5栋 · 边柱净距850mm · 梁出柱200mm · 斜边梁'+diagonalBeams+'段 · 水槽'+gutterCount+'道 · 落水管'+downpipeCount+'根 · 光伏'+pvCount+'块';
+ document.getElementById('side').textContent='斜角在'+(leftSide?'左':'右')+'侧长边';
+ document.getElementById('switch').textContent='斜角镜像到'+(leftSide?'右':'左')+'边';
+ updateMini();
+}
+function updateMini(){const pts=leftSide?[[10,190],[95,190],[95,15],[22.5,15],[10,109.8]]:[[10,190],[95,190],[82.5,15],[10,15]];
+ if(!leftSide)pts.splice(2,0,[95,109.8]);
+ document.getElementById('shape').setAttribute('d','M'+pts.map(p=>p.join(' ')).join(' L')+' Z');
+ document.getElementById('minilines').innerHTML=[8.4,16.8,25.2,33.6,42,50.4,58.8,67.2].map(z=>{
+ const Y=190-z*175/73.3,Xmin=10+(leftSide?inset(z):0)*85/34,Xmax=10+(leftSide?34:34-inset(z))*85/34;
+ return '<line class="'+([16.8,33.6,50.4,67.2].includes(z)?'ridge':'boundary')+'" x1="'+Xmin+'" y1="'+Y+'" x2="'+Xmax+'" y2="'+Y+'"/>';
+ }).join('');
+}
+function project(P){const x=P[0]-(detailMode?33.6:17),y=P[1]-(detailMode?1.25:1.65),z=P[2]-(detailMode?25.2:36.65);
+ const xx=x*Math.cos(ang)+z*Math.sin(ang),zz=-x*Math.sin(ang)+z*Math.cos(ang),scale=Math.min(width/85,height/95)*zoom;
+ return [width/2+xx*scale,height/2+(zz*Math.sin(pitch)-y*Math.cos(pitch))*scale,zz*Math.cos(pitch)+y*Math.sin(pitch)];}
+function draw(){if(!width||!height)return;ctx.clearRect(0,0,width,height);ctx.fillStyle='#08121e';ctx.fillRect(0,0,width,height);
+ ctx.strokeStyle='#223645';ctx.lineWidth=.7;
+ for(let x=0;x<=34;x+=4){const a=project([x,-.1,0]),b=project([x,-.1,L]);ctx.beginPath();ctx.moveTo(a[0],a[1]);ctx.lineTo(b[0],b[1]);ctx.stroke();}
+ for(let z=0;z<=L;z+=5){const a=project([0,-.1,z]),b=project([34,-.1,z]);ctx.beginPath();ctx.moveTo(a[0],a[1]);ctx.lineTo(b[0],b[1]);ctx.stroke();}
+ for(const entry of faces.map(f=>({f,depth:f.points.reduce((s,p)=>s+project(p)[2],0)/f.points.length})).sort((a,b)=>b.depth-a.depth)){
+ const f=entry.f;ctx.beginPath();for(let i=0;i<f.points.length;i++){const a=project(f.points[i]);i?ctx.lineTo(a[0],a[1]):ctx.moveTo(a[0],a[1]);}ctx.closePath();ctx.fillStyle=f.fill;ctx.fill();if(f.outline){ctx.strokeStyle=f.outline;ctx.lineWidth=f.sw;ctx.stroke();}}
+ for(const s of segments){const a=project(s.a),b=project(s.b);ctx.beginPath();ctx.moveTo(a[0],a[1]);ctx.lineTo(b[0],b[1]);ctx.strokeStyle=s.color;ctx.lineWidth=s.sw;ctx.stroke();}
+ // Ground decorative yellow line removed.
+}
+function resize(){dpr=Math.min(devicePixelRatio||1,2);width=canvas.clientWidth;height=canvas.clientHeight;canvas.width=width*dpr;canvas.height=height*dpr;ctx.setTransform(dpr,0,0,dpr,0,0);draw();}
+function rebuild(){build();draw();}
+function view(a,p,z,id){ang=a;pitch=p;zoom=z;document.querySelectorAll('#panel button').forEach(b=>b.classList.remove('selected'));document.getElementById(id).classList.add('selected');draw();}
+document.getElementById('iso').onclick=()=>view(-.52,.78,1.15,'iso');
+document.getElementById('top').onclick=()=>view(0,Math.PI/2,1.12,'top');
+document.getElementById('front').onclick=()=>view(Math.PI/2,.18,1.15,'front');
+document.getElementById('reset').onclick=()=>{level=3;leftSide=false;reverseDrag=false;detailMode=false;solar=roof=purlins=gutters=true;document.getElementById('height').value=3;document.getElementById('dragReverse').textContent='旋转手势：拖动模型';document.getElementById('detail').textContent='查看升降柱细节';document.getElementById('heightLabel').textContent='3.00米';document.getElementById('pv').textContent='隐藏光伏';document.getElementById('roof').textContent='隐藏屋面';document.getElementById('purlins').textContent='隐藏檩条';document.getElementById('gutters').textContent='隐藏水槽';view(-.52,.78,1.15,'iso');rebuild();};
+document.getElementById('frameView').onclick=()=>{roof=false;solar=false;purlins=true;document.getElementById('roof').textContent='显示屋面';document.getElementById('pv').textContent='显示光伏';document.getElementById('purlins').textContent='隐藏檩条';zoom=2.1;ang=-.62;pitch=.38;detailMode=false;rebuild();};
+document.getElementById('switch').onclick=()=>{leftSide=!leftSide;rebuild();};
+document.getElementById('dragReverse').onclick=()=>{reverseDrag=!reverseDrag;document.getElementById('dragReverse').textContent='旋转手势：'+(reverseDrag?'反向':'拖动模型');};
+document.getElementById('detail').onclick=()=>{detailMode=!detailMode;zoom=detailMode?3.8:1.15;ang=detailMode?-.77:-.52;pitch=detailMode?.25:.78;document.getElementById('detail').textContent=detailMode?'返回整体':'查看升降柱细节';draw();};
+document.getElementById('height').oninput=e=>{level=+e.target.value;document.getElementById('heightLabel').textContent=level.toFixed(2)+'米';rebuild();};
+for(const [name,get,set,label] of [['pv',()=>solar,v=>solar=v,'光伏'],['roof',()=>roof,v=>roof=v,'屋面'],['purlins',()=>purlins,v=>purlins=v,'檩条'],['gutters',()=>gutters,v=>gutters=v,'水槽']])document.getElementById(name).onclick=()=>{set(!get());document.getElementById(name).textContent=(get()?'隐藏':'显示')+label;rebuild();};
+const pointers=new Map();let pinch=0;
+canvas.addEventListener('pointerdown',e=>{pointers.set(e.pointerId,[e.clientX,e.clientY]);canvas.setPointerCapture(e.pointerId);});
+canvas.addEventListener('pointermove',e=>{if(!pointers.has(e.pointerId))return;const last=pointers.get(e.pointerId);pointers.set(e.pointerId,[e.clientX,e.clientY]);if(pointers.size===1){const dir=reverseDrag?-1:1;ang+=dir*(e.clientX-last[0])*.008;pitch+=dir*(e.clientY-last[1])*.007;draw();}else if(pointers.size===2){const a=[...pointers.values()],dist=Math.hypot(a[0][0]-a[1][0],a[0][1]-a[1][1]);if(pinch>0)zoom=Math.max(.00001,zoom*dist/pinch);pinch=dist;draw();}});
+const release=e=>{pointers.delete(e.pointerId);pinch=0;};canvas.addEventListener('pointerup',release);canvas.addEventListener('pointercancel',release);
+canvas.addEventListener('wheel',e=>{e.preventDefault();zoom=Math.max(.00001,zoom*(e.deltaY>0?.91:1.09));draw();},{passive:false});
+window.__modelQA=()=>({gapMM:850,overhangMM:200,roofEaveGapMM:450,gutterCount,downpipeCount,diagonalBeams,noRidgeEaveBeams:true,noDuplicateDiagonalPosts:true,side:leftSide?'left':'right',level,pvCount,faces:faces.length,columnsScale:[COLUMN_OUT,COLUMN_IN],HBeamDepth:H_BEAM_DEPTH,CSection:[.220,.060,.020,.002],CCount:cPurlinCount,blackBeamCount:beamCount,connectedNodes:connectionCount,independentPosts:postCount,bayCount:bays.length,gap:GAP,dragReverse:reverseDrag,zoom,yaw:ang,pitch,roofProfile:'840-gray',removedGroundContour:true});window.addEventListener('resize',resize);build();resize();
+})();
+</script></body></html>
